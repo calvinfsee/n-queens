@@ -159,23 +159,25 @@
     sumMinor: function (col, row) {
       var row = row || 0; //if row is undefined, set to 0
 
-      if (col < 0 || row > this.attributes.n) {
+      if (col > 0 || row > this.attributes.n) {
         return 0;
       }
-      return this.attributes[row][col] + sumMinor(col - 1, row + 1);
+      console.log('line 165:', col, row)
+      return this.attributes[row][col] + this.sumMinor(col - 1, row + 1);
     },
+
     hasMinorDiagonalConflictAt: function(colIndex, rowIndex) {
       return this.sumMinor(colIndex, rowIndex) > 1;
     },
 
     // test if any minor diagonals on this board contain conflicts
-    hasAnyMinorDiagonalConflicts: function() { //ohhh i figured out the problem. ill be done in like 5 minutes and explain it
+    hasAnyMinorDiagonalConflicts: function() {
       for (let colIndex = 1; colIndex < this.attributes.n; colIndex++) {
         if (this.hasMinorDiagonalConflictAt(colIndex)) {
           return true;
         }
       }
-      for (let rowIndex = 1; rowIndex < this.attributes.n; rowIndex++) {
+      for (let rowIndex = 0; rowIndex < this.attributes.n; rowIndex++) {
         if (this.hasMinorDiagonalConflictAt(this.attributes.n - 1, rowIndex)) {
           return true;
         }
