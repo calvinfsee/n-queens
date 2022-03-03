@@ -82,12 +82,21 @@
     },
 
     // test if any rows on this board contain conflicts
-    hasAnyRowConflicts: function(rowIndex) {
-      var rowIndex = rowIndex || 0;
-      let conflict = this.hasRowConflictAt(rowIndex) || false;
 
-      return rowIndex + 1 < this.attributes.n && !conflict ? //If within confines of array and no conflict has been found
-        this.hasAnyRowConflicts(rowIndex + 1) : conflict; //check next row or return rowConflict and exit method
+    // hasAnyRowConflicts: function(rowIndex) {
+    //   var rowIndex = rowIndex || 0;
+    //   let conflict = this.hasRowConflictAt(rowIndex) || false;
+
+    //   return rowIndex + 1 < this.attributes.n && !conflict ? //If within confines of array and no conflict has been found
+    //     this.hasAnyRowConflicts(rowIndex + 1) : conflict; //check next row or return rowConflict and exit method
+    // },
+    hasAnyRowConflicts: function() { //non recursive version
+      for (let row = 0; row < this.attributes.n; row++) {
+        if (this.hasRowConflictAt(row)) {
+          return true;
+        }
+      }
+      return false;
     },
 
 
@@ -101,12 +110,20 @@
     },
 
     // test if any columns on this board contain conflicts
-    hasAnyColConflicts: function(colIndex) {
-      var colIndex = colIndex || 0;
-      let conflict = this.hasColConflictAt(colIndex) || false;
+    // hasAnyColConflicts: function(colIndex) {
+    //   var colIndex = colIndex || 0;
+    //   let conflict = this.hasColConflictAt(colIndex) || false;
 
-      return colIndex + 1 < this.attributes.n && !conflict ?
-        this.hasAnyColConflicts(colIndex + 1) : conflict;
+    //   return colIndex + 1 < this.attributes.n && !conflict ?
+    //     this.hasAnyColConflicts(colIndex + 1) : conflict;
+    // },
+    hasAnyColConflicts: function() { //non recursive version
+      for (let col = 0; col < this.attributes.n; col++) {
+        if (this.hasColConflictAt(col)) {
+          return true;
+        }
+      }
+      return false;
     },
     // Major Diagonals - go from top-left to bottom-right
     // --------------------------------------------------------------
@@ -122,6 +139,23 @@
       return index > 0 ?
         this.sumMajor(0, index) > 1 : this.sumMajor(index * -1, 0) > 1;
     },
+    // hasMajorDiagonalConflictAt: function(index) { //non recursive solution
+    //   let total = 0;
+    //   let colIndex = 0;
+    //   let rowIndex = 0;
+    //   if (index > 0) {
+    //     colIndex = index;
+    //   } else {
+    //     rowIndex = index * -1;
+    //   }
+
+    //   while (colIndex < this.attributes.n && rowIndex < this.attributes.n) {
+    //     total += this.attributes[rowIndex][colIndex];
+    //     colIndex++;
+    //     rowIndex++;
+    //   }
+    //   return total > 1;
+    // },
 
     hasAnyMajorDiagonalConflicts: function() {
       for (let index = this.attributes.n * -1 + 2; index < this.attributes.n - 2; index++) { //no conflicts at last column or row
