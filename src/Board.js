@@ -1,7 +1,6 @@
 // This file is a Backbone Model (don't worry about what that means)
 // It's part of the Board Visualizer
 // The only portions you need to work on are the helper functions (below)
-
 (function() {
 
   window.Board = Backbone.Model.extend({
@@ -62,7 +61,7 @@
     },
 
 
-/*
+    /*
          _             _     _
      ___| |_ __ _ _ __| |_  | |__   ___ _ __ ___ _
     / __| __/ _` | '__| __| | '_ \ / _ \ '__/ _ (_)
@@ -79,12 +78,17 @@
     //
     // test if a specific row on this board contains a conflict
     hasRowConflictAt: function(rowIndex) {
-      return false; // fixme
+      return _.reduce(this.attributes[rowIndex], (x, y) => x + y, 0) > 1;
     },
 
     // test if any rows on this board contain conflicts
-    hasAnyRowConflicts: function() {
-      return false; // fixme
+    hasAnyRowConflicts: function(rowIndex) {
+      var rowIndex = rowIndex || 0;
+      if (this.hasRowConflictAt(rowIndex)) {
+        return true;
+      }
+      return rowIndex < this.attributes.n ? //If within confines of the board
+        this.hasAnyRowConflicts(rowIndex + 1) : false; //
     },
 
 
@@ -94,28 +98,57 @@
     //
     // test if a specific column on this board contains a conflict
     hasColConflictAt: function(colIndex) {
-      return false; // fixme
+      return _.reduce(this.rows(), (x, y) => x + y[colIndex], 0) > 1;
     },
 
     // test if any columns on this board contain conflicts
-    hasAnyColConflicts: function() {
-      return false; // fixme
+    hasAnyColConflicts: function(colIndex) {
+      var colIndex = colIndex || 0;
+
+      if (this.hasColConflictAt(colIndex)) {
+        return true;
+      }
+      return colIndex + 1 < this.attributes.n ?
+        this.hasAnyColConflicts(colIndex + 1) : false;
     },
-
-
-
     // Major Diagonals - go from top-left to bottom-right
     // --------------------------------------------------------------
     //
     // test if a specific major diagonal on this board contains a conflict
-    hasMajorDiagonalConflictAt: function(majorDiagonalColumnIndexAtFirstRow) {
-      return false; // fixme
+
+    sumMajor: function (col, row) { //Adds a diagonal together
+      var row = row || 0; //if row is undefined, set to 0
+
+      return col < this.attributes.n ? //if col is within bounds of array
+        this.attributes[col][row] + this.sumMajor(col + 1, row + 1) : 0; //return sum of diagonal
+    },
+
+    hasMajorDiagonalConflictAt: function(colIndex, rowIndex) {
+      return this.sumMajor(colIndex, rowIndex) > 1;
     },
 
     // test if any major diagonals on this board contain conflicts
     hasAnyMajorDiagonalConflicts: function() {
-      return false; // fixme
+      for (let colIndex = 0; colIndex < this.attributes.n; colIndex++) {
+        if (this.hasMajorDiagonalConflictAt(colIndex)) {
+          return true;
+        }
+      }
+      for (let rowIndex = 0; rowIndex < this.attributes.n; rowIndex++) {
+        if (this.hasMajorDiagonalConflictAt(0, rowIndex)) {
+          return true;
+        }
+      }
+      return false;
     },
+
+    // 1 0 0
+    // 0 1 0
+    // 0 0 0
+
+    //0 0 0
+    //1 0 0
+    //0 1 0
 
 
 
@@ -123,13 +156,31 @@
     // --------------------------------------------------------------
     //
     // test if a specific minor diagonal on this board contains a conflict
-    hasMinorDiagonalConflictAt: function(minorDiagonalColumnIndexAtFirstRow) {
-      return false; // fixme
+    sumMinor: function (col, row) {
+      var row = row || 0; //if row is undefined, set to 0
+
+      if (col < 0 || row > this.attributes.n) {
+        return this.attributes[row][col];
+      }
+      return this.attributes[row][col] + sumMinor(col - 1, row + 1);
+    },
+    hasMinorDiagonalConflictAt: function(colIndex, rowIndex) {
+      return this.sumMinor(colIndex, rowIndex) > 1;
     },
 
     // test if any minor diagonals on this board contain conflicts
-    hasAnyMinorDiagonalConflicts: function() {
-      return false; // fixme
+    hasAnyMinorDiagonalConflicts: function() { //ohhh i figured out the problem. ill be done in like 5 minutes and explain it
+      for (let colIndex = 1; colIndex < this.attributes.n; colIndex++) {
+        if (this.hasMinorDiagonalConflictAt(colIndex)) {
+          return true;
+        }
+      }
+      for (let rowIndex = 1; rowIndex < this.attributes.n; rowIndex++) {
+        if (this.hasMinorDiagonalConflictAt(this.attributes.n - 1, rowIndex)) {
+          return true;
+        }
+      }
+      return false;
     }
 
     /*--------------------  End of Helper Functions  ---------------------*/

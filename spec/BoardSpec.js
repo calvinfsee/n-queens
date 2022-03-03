@@ -169,6 +169,7 @@ describe('Board', function() {
   });
 
   describe('Board with minor diagonal conflicts', function() {
+    // debugger;
     var matrix = [
       [0, 0, 1, 0],
       [0, 0, 0, 0],
