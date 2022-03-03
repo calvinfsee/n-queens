@@ -142,41 +142,24 @@
       return false;
     },
 
-    // 1 0 0
-    // 0 1 0
-    // 0 0 0
-
-    //0 0 0
-    //1 0 0
-    //0 1 0
-
-
-
     // Minor Diagonals - go from top-right to bottom-left
     // --------------------------------------------------------------
     //
     // test if a specific minor diagonal on this board contains a conflict
-    sumMinor: function (col, row) {
-      var row = row || 0; //if row is undefined, set to 0
-
-      if (col < 0 || row > this.attributes.n) {
+    sumMinor: function (row, col) {
+      if (row === this.attributes.n || col === 0) {
         return 0;
       }
-      return this.attributes[row][col] + sumMinor(col - 1, row + 1);
+      return this.attributes[row][col] + this.sumMinor(row + 1, col - 1);
     },
-    hasMinorDiagonalConflictAt: function(colIndex, rowIndex) {
-      return this.sumMinor(colIndex, rowIndex) > 1;
+    hasMinorDiagonalConflictAt: function(rowIndex, colIndex) {
+      return this.sumMinor(rowIndex, colIndex) > 1;
     },
 
-    // test if any minor diagonals on this board contain conflicts
-    hasAnyMinorDiagonalConflicts: function() { //ohhh i figured out the problem. ill be done in like 5 minutes and explain it
-      for (let colIndex = 1; colIndex < this.attributes.n; colIndex++) {
-        if (this.hasMinorDiagonalConflictAt(colIndex)) {
-          return true;
-        }
-      }
-      for (let rowIndex = 1; rowIndex < this.attributes.n; rowIndex++) {
-        if (this.hasMinorDiagonalConflictAt(this.attributes.n - 1, rowIndex)) {
+    hasAnyMinorDiagonalConflicts: function() {
+      for (let index = 1; index < this.attributes.n; index++) {
+        if (this.hasMinorDiagonalConflictAt(0, index) ||
+        this.hasMinorDiagonalConflictAt(index, this.attributes.n - 1)) {
           return true;
         }
       }
