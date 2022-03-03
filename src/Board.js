@@ -160,7 +160,7 @@
       var row = row || 0; //if row is undefined, set to 0
 
       if (col < 0 || row > this.attributes.n) {
-        return this.attributes[row][col];
+        return 0;
       }
       return this.attributes[row][col] + sumMinor(col - 1, row + 1);
     },
