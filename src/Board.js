@@ -84,11 +84,10 @@
     // test if any rows on this board contain conflicts
     hasAnyRowConflicts: function(rowIndex) {
       var rowIndex = rowIndex || 0;
-      if (this.hasRowConflictAt(rowIndex)) {
-        return true;
-      }
-      return rowIndex < this.attributes.n ? //If within confines of the board
-        this.hasAnyRowConflicts(rowIndex + 1) : false; //
+      let conflict = this.hasRowConflictAt(rowIndex) || false;
+
+      return rowIndex + 1 < this.attributes.n && !conflict ? //If within confines of array and no conflict has been found
+        this.hasAnyRowConflicts(rowIndex + 1) : conflict; //check next row or return rowConflict and exit method
     },
 
 
@@ -104,58 +103,40 @@
     // test if any columns on this board contain conflicts
     hasAnyColConflicts: function(colIndex) {
       var colIndex = colIndex || 0;
+      let conflict = this.hasColConflictAt(colIndex) || false;
 
-      if (this.hasColConflictAt(colIndex)) {
-        return true;
-      }
-      return colIndex + 1 < this.attributes.n ?
-        this.hasAnyColConflicts(colIndex + 1) : false;
+      return colIndex + 1 < this.attributes.n && !conflict ?
+        this.hasAnyColConflicts(colIndex + 1) : conflict;
     },
     // Major Diagonals - go from top-left to bottom-right
     // --------------------------------------------------------------
     //
     // test if a specific major diagonal on this board contains a conflict
 
-    sumMajor: function (col, row) { //Adds a diagonal together
-      var row = row || 0; //if row is undefined, set to 0
-
-      return col < this.attributes.n ? //if col is within bounds of array
-        this.attributes[col][row] + this.sumMajor(col + 1, row + 1) : 0; //return sum of diagonal
+    sumMajor: function (row, col) { //Adds a major diagonal
+      return row < this.attributes.n && col < this.attributes.n ? //If row and col are less than array length
+        this.attributes[row][col] + this.sumMajor(col + 1, row + 1) : 0; //recursively add OR return 0 to exit program
     },
 
-    hasMajorDiagonalConflictAt: function(colIndex, rowIndex) {
-      return this.sumMajor(colIndex, rowIndex) > 1;
+    hasMajorDiagonalConflictAt: function(rowIndex, colIndex) {
+      return this.sumMajor(rowIndex, colIndex) > 1;
     },
 
-    // test if any major diagonals on this board contain conflicts
     hasAnyMajorDiagonalConflicts: function() {
-      for (let colIndex = 0; colIndex < this.attributes.n; colIndex++) {
-        if (this.hasMajorDiagonalConflictAt(colIndex)) {
-          return true;
-        }
-      }
-      for (let rowIndex = 0; rowIndex < this.attributes.n; rowIndex++) {
-        if (this.hasMajorDiagonalConflictAt(0, rowIndex)) {
+      for (let index = 0; index < this.attributes.n - 1; index++) { //no conflicts at last column or row
+        if (this.hasMajorDiagonalConflictAt(0, index) || //scans for conflicts to the right
+        this.hasMajorDiagonalConflictAt(index, 0)) { //scans down
           return true;
         }
       }
       return false;
     },
 
-    // 1 0 0
-    // 0 1 0
-    // 0 0 0
-
-    //0 0 0
-    //1 0 0
-    //0 1 0
-
-
-
     // Minor Diagonals - go from top-right to bottom-left
     // --------------------------------------------------------------
     //
     // test if a specific minor diagonal on this board contains a conflict
+<<<<<<< HEAD
     sumMinor: function (col, row) {
       var row = row || 0; //if row is undefined, set to 0
 
@@ -179,6 +160,20 @@
       }
       for (let rowIndex = 0; rowIndex < this.attributes.n; rowIndex++) {
         if (this.hasMinorDiagonalConflictAt(this.attributes.n - 1, rowIndex)) {
+=======
+    sumMinor: function (row, col) { //adds minor diagonals
+      return row < this.attributes.n && col > -1 ? //If within confines of array
+        this.attributes[row][col] + this.sumMinor(row + 1, col - 1) : 0; //recursively add OR return 0 and exit method
+    },
+    hasMinorDiagonalConflictAt: function(rowIndex, colIndex) {
+      return this.sumMinor(rowIndex, colIndex) > 1;
+    },
+
+    hasAnyMinorDiagonalConflicts: function() {
+      for (let index = 1; index < this.attributes.n; index++) { //no conflicts at index 0
+        if (this.hasMinorDiagonalConflictAt(0, index) || //scans for conflicts to the left
+        this.hasMinorDiagonalConflictAt(index, this.attributes.n - 1)) { //scans down
+>>>>>>> 4872a14a2d424cc36ef772d65e397039b68b1ade
           return true;
         }
       }
