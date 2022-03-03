@@ -19,9 +19,6 @@ window.findNRooksSolution = function(n) {
   var solution = new Board({n: n});
 
   for (let index = 0; index < n; index++) {
-    if (index === n) {
-      break;
-    }
     solution.togglePiece(index, index);
   }
   console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution.rows()));
@@ -30,10 +27,13 @@ window.findNRooksSolution = function(n) {
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
+
+  return n > 1 ? n * window.countNRooksSolutions(n - 1) : 1; //cheeky factorial solution
+
   var solutionCount = 0;
   var solutionBoard = new Board({n: n});
 
-  var findSolutions = function (rowIndex) {
+  var findSolutions = function (rowIndex) { //Tree solution, each iteration of findSolutions creates a new branch
     var rowIndex = rowIndex || 0; //each row can only have 1 piece, so rowIndex represents # of pieces
 
     if (rowIndex === n) { //Have I reached the max # of pieces on the board?
@@ -41,13 +41,13 @@ window.countNRooksSolutions = function(n) {
       return;
     }
 
-    for (let colIndex = 0; colIndex < n; colIndex++) { //iterates through columns
+    for (let colIndex = 0; colIndex < n; colIndex++) { //iterates through column
       solutionBoard.togglePiece(rowIndex, colIndex); //add piece
 
       if (!solutionBoard.hasAnyRooksConflicts()) { //if the new piece doesnt cause conflicts,
-        findSolutions(rowIndex + 1); //then go to the next row, which will keep adding pieces until we reach n
+        findSolutions(rowIndex + 1); //then create a new branch
       }
-      solutionBoard.togglePiece(rowIndex, colIndex); //remove piece
+      solutionBoard.togglePiece(rowIndex, colIndex); //removes piece when you have tried all possible variations of this branch
     }
   };
   findSolutions();
@@ -62,29 +62,30 @@ window.findNQueensSolution = function(n) {
   if (n === 2 || n === 3) {
     return solutionBoard.rows();
   }
-  var solution;
-  var solutionFound = false;
+  var solution = false;
+
   var findSolution = function (rowIndex) {
-    var rowIndex = rowIndex || 0;
-    if (rowIndex === n) {
-      solution = solutionBoard.rows();
-      solutionFound = true;
+    if (rowIndex === n || solution) {
+      solution = true;
       return;
     }
+    var rowIndex = rowIndex || 0;
+
     for (let colIndex = 0; colIndex < n; colIndex++) {
       solutionBoard.togglePiece(rowIndex, colIndex);
       if (!solutionBoard.hasAnyQueensConflicts()) {
         findSolution(rowIndex + 1);
       }
-      if (solutionFound) {
+      if (solution) { //if a solution has been found, exit the recursive method
         return;
+      } else {
+        solutionBoard.togglePiece(rowIndex, colIndex);
       }
-      solutionBoard.togglePiece(rowIndex, colIndex);
     }
   };
   findSolution();
   console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
-  return solution;
+  return solutionBoard.rows();
 };
 
 //return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
@@ -107,7 +108,7 @@ window.countNQueensSolutions = function(n) {
       solutionBoard.togglePiece(rowIndex, colIndex); //add piece
 
       if (!solutionBoard.hasAnyQueensConflicts()) { //if the new piece doesnt cause conflicts,
-        findSolutions(rowIndex + 1); //then go to the next row, which will keep adding pieces until we reach n
+        findSolutions(rowIndex + 1); //then create a new branch and iterate through all variations
       }
       solutionBoard.togglePiece(rowIndex, colIndex); //remove piece
     }
