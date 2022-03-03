@@ -115,17 +115,17 @@
 
     sumMajor: function (row, col) { //Adds a major diagonal
       return row < this.attributes.n && col < this.attributes.n ? //If row and col are less than array length
-        this.attributes[row][col] + this.sumMajor(col + 1, row + 1) : 0; //recursively add OR return 0 to exit program
+        this.attributes[row][col] + this.sumMajor(row + 1, col + 1) : 0; //recursively add OR return 0 to exit program
     },
 
-    hasMajorDiagonalConflictAt: function(rowIndex, colIndex) {
-      return this.sumMajor(rowIndex, colIndex) > 1;
+    hasMajorDiagonalConflictAt: function(index) {
+      return index > 0 ?
+        this.sumMajor(0, index) > 1 : this.sumMajor(index * -1, 0) > 1;
     },
 
     hasAnyMajorDiagonalConflicts: function() {
-      for (let index = 0; index < this.attributes.n - 1; index++) { //no conflicts at last column or row
-        if (this.hasMajorDiagonalConflictAt(0, index) || //scans for conflicts to the right
-        this.hasMajorDiagonalConflictAt(index, 0)) { //scans down
+      for (let index = this.attributes.n * -1 + 2; index < this.attributes.n - 2; index++) { //no conflicts at last column or row
+        if (this.hasMajorDiagonalConflictAt(index)) {
           return true;
         }
       }
@@ -140,14 +140,14 @@
       return row < this.attributes.n && col > -1 ? //If within confines of array
         this.attributes[row][col] + this.sumMinor(row + 1, col - 1) : 0; //recursively add OR return 0 and exit method
     },
-    hasMinorDiagonalConflictAt: function(rowIndex, colIndex) {
-      return this.sumMinor(rowIndex, colIndex) > 1;
+    hasMinorDiagonalConflictAt: function(index) {
+      return index < this.attributes.n ?
+        this.sumMinor(0, index) > 1 : this.sumMinor(index - this.attributes.n + 1, this.attributes.n - 1) > 1;
     },
 
     hasAnyMinorDiagonalConflicts: function() {
-      for (let index = 1; index < this.attributes.n; index++) { //no conflicts at index 0
-        if (this.hasMinorDiagonalConflictAt(0, index) || //scans for conflicts to the left
-        this.hasMinorDiagonalConflictAt(index, this.attributes.n - 1)) { //scans down
+      for (let index = 1; index < (this.attributes.n * 2 - 2); index++) { //no conflicts at index 0
+        if (this.hasMinorDiagonalConflictAt(index)) {
           return true;
         }
       }
